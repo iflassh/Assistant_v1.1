@@ -1,0 +1,26 @@
+# Секреты — никогда не коммитим
+.env
+
+# Виртуальные окружения Python
+.venv/
+venv/
+
+# Кэши Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Базы данных
+*.db
+*.sqlite
+*.sqlite3
+
+# Файлы IDE (PyCharm, VS Code)
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Операционные системы
+.DS_Store
+Thumbs.db
