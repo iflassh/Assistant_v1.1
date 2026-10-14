@@ -138,7 +138,7 @@ class MovieRecommendationEngine:
             return movies
         except Exception as e:
             logger.warning(f"API недоступен ({e}). Иду в кэш каталога.")
-            return self._repo.get_catalog(limit=limit)
+            return self._repo.get_catalog()
 
 
 # --- Тестовый блок: полный сценарий без реального API ---

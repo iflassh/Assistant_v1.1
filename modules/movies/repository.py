@@ -68,15 +68,12 @@ class MovieRepository:
         )
 
     #Метод добавлен
-    def get_catalog(self, limit: int = 50) -> List[Movie]:
-        """
-        Возвращает кэш фильмов из БД (запасной источник, если API упал).
-        Сортируем по рейтингу — пусть запасной вариант будет достойным.
-        """
+    def get_catalog(self) -> List[Movie]:
+        """Возвращает весь локальный каталог по убыванию рейтинга."""
         rows = self._conn.execute(
-            "SELECT * FROM movies ORDER BY rating DESC, votes DESC LIMIT ?",
-            (limit,),
+            "SELECT * FROM movies ORDER BY rating DESC, votes DESC"
         ).fetchall()
+
         return [self._row_to_movie(r) for r in rows]
     
     # ------------------------------------------------------------------
