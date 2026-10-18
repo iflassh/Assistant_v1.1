@@ -4,6 +4,12 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+@dataclass
+class MoviePreferences:
+    preferred_genres: List[str] = field(default_factory=list)
+
+preferences=MoviePreferences(["фантастика", "драма"])
+print(preferences.preferred_genres)
 
 @dataclass
 class Movie:

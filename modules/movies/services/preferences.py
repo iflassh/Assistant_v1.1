@@ -3,8 +3,9 @@
 
 from abc import ABC, abstractmethod
 from typing import List
+from modules.movies.models import Movie, MoviePreferences
 
-from core.models import User
+#from core.models import User удалить
 from modules.movies.models import Movie
 
 
@@ -15,15 +16,15 @@ class PreferenceStrategy(ABC):
     """
 
     @abstractmethod
-    def pick(self, movies: List[Movie], user: User, limit: int = 3) -> List[Movie]:
+    def pick(self, movies: List[Movie], preferences: MoviePreferences, limit: int = 3) -> List[Movie]:
         """Выбирает лучшие фильмы для конкретного пользователя."""
 
 
 class GenrePreferenceStrategy(PreferenceStrategy):
-    """Подбирает фильмы по любимым жанрам пользователя."""
+    #user_genres = set(preferences.preferred_genres)
 
-    def pick(self, movies: List[Movie], user: User, limit: int = 3) -> List[Movie]:
-        user_genres = set(user.preferred_genres)
+    def pick(self, movies: List[Movie], preferences: MoviePreferences, limit: int = 3) -> List[Movie]:
+        user_genres = set(preferences.preferred_genres)
 
         # Graceful degradation: если у пользователя ещё нет жанров,
         # не падаем, а просто показываем лучшее по рейтингу.
@@ -43,21 +44,21 @@ class GenrePreferenceStrategy(PreferenceStrategy):
 class TopRatedStrategy(PreferenceStrategy):
     """Запасная стратегия: просто самые рейтинговые фильмы."""
 
-    def pick(self, movies: List[Movie], user: User, limit: int = 3) -> List[Movie]:
+    def pick(self, movies: List[Movie], preferences: MoviePreferences, limit: int = 3) -> List[Movie]:
         return sorted(movies, key=lambda m: (m.rating, m.votes), reverse=True)[:limit]
 
 
 if __name__ == "__main__":
     print("--- Тестируем стратегии ---")
 
-    user = User(vk_id=1, preferred_genres=["фантастика"])
+    preferences = MoviePreferences(preferred_genres=["фантастика"])
 
     m1 = Movie(kinopoisk_id=1, title="Интерстеллар", rating=8.6, votes=500000, genres=["фантастика", "драма"])
     m2 = Movie(kinopoisk_id=2, title="Супер-комедия", rating=9.0, votes=400000, genres=["комедия"])
     m3 = Movie(kinopoisk_id=3, title="Дюна", rating=8.0, votes=300000, genres=["фантастика", "приключения"])
 
     strategy = GenrePreferenceStrategy()
-    result = strategy.pick([m1, m2, m3], user, limit=2)
+    result = strategy.pick([m1, m2, m3], preferences, limit=2)
 
     for movie in result:
         print(f"  {movie.title}")

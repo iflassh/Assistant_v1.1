@@ -7,7 +7,7 @@ from typing import List, Optional, Set
 import logging
 
 from core.database import Database
-from core.models import User
+from modules.movies.models import Movie, MoviePreferences
 from modules.movies.models import Movie
 from modules.movies.config import MovieSettings
 from modules.movies.client import MovieApiClient
@@ -51,7 +51,7 @@ class MovieRecommendationEngine:
 
     def recommend(
         self,
-        user: User,
+        preferences: MoviePreferences,
         limit: int = 3,
         exclude_ids: Optional[Set[int]] = None,
     ) -> List[Movie]:
@@ -83,14 +83,14 @@ class MovieRecommendationEngine:
         # Основная стратегия, при сбое — запасная
         try:
             recommendations = self._default_strategy.pick(
-                clean_movies, user, limit=limit
+                clean_movies, preferences, limit=limit
             )
             if recommendations:
                 return recommendations
         except Exception as e:
             logger.error(f"Ошибка основной стратегии: {e}. Берём запасную.")
 
-        return self._fallback_strategy.pick(clean_movies, user, limit=limit)
+        return self._fallback_strategy.pick(clean_movies, preferences, limit=limit)
 
     # ------------------------------------------------------------------
     # «Взрослый» метод: полный сценарий с базой
@@ -99,18 +99,19 @@ class MovieRecommendationEngine:
     def recommend_for_user(self, vk_id: int, limit: int = 3) -> List[Movie]:
         """
         Полный сценарий для конкретного пользователя VK:
-        1. собираем пользователя из двух владельцев (ядро + модуль);
+        1. обеспечиваем наличие пользователя в БД и загружаем его предпочтения;
         2. подбираем, исключая показанные;
         3. отмечаем рекомендованное как показанное.
         """
-        # 1. Пользователь: база из ядра, жанры из репозитория модуля
+        # 1. Пользователь в БД и предпочтения для подбора фильмов
         self._db.ensure_user(vk_id)
-        user = self._db.get_user(vk_id)
-        user.preferred_genres = self._repo.get_user_genres(vk_id)
+        preferences = MoviePreferences(
+            preferred_genres=self._repo.get_user_genres(vk_id)
+        )
 
         # 2. История показов → исключаем
         shown = self._repo.get_shown_ids(vk_id)
-        recommendations = self.recommend(user, limit=limit, exclude_ids=shown)
+        recommendations = self.recommend(preferences, limit=limit, exclude_ids=shown)
 
         # 3. Что рекомендовали — считаем показанным
         if recommendations:
