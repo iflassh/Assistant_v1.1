@@ -51,14 +51,20 @@ class TopRatedStrategy(PreferenceStrategy):
 if __name__ == "__main__":
     print("--- Тестируем стратегии ---")
 
-    preferences = MoviePreferences(preferred_genres=["фантастика"])
+    preferences = MoviePreferences(
+        preferred_genres=["фантастика", "драма"]
+    )
 
-    m1 = Movie(kinopoisk_id=1, title="Интерстеллар", rating=8.6, votes=500000, genres=["фантастика", "драма"])
-    m2 = Movie(kinopoisk_id=2, title="Супер-комедия", rating=9.0, votes=400000, genres=["комедия"])
-    m3 = Movie(kinopoisk_id=3, title="Дюна", rating=8.0, votes=300000, genres=["фантастика", "приключения"])
+    #m1 = Movie(kinopoisk_id=1, title="Интерстеллар", rating=8.6, votes=500000, genres=["фантастика", "драма"])
+    #m2 = Movie(kinopoisk_id=2, title="Супер-комедия", rating=9.0, votes=400000, genres=["комедия"])
+    #m3 = Movie(kinopoisk_id=3, title="Дюна", rating=8.0, votes=300000, genres=["фантастика", "приключения"])
+
+    m1 = Movie(kinopoisk_id=1, title="A", rating=7.6, votes=1000, genres=["фантастика", "драма"])
+    m2 = Movie(kinopoisk_id=2, title="B", rating=9.0, votes=5000, genres=["фантастика"])
+    m3 = Movie(kinopoisk_id=3, title="C", rating=7.5, votes=3000, genres=["фантастика", "драма"])
 
     strategy = GenrePreferenceStrategy()
-    result = strategy.pick([m1, m2, m3], preferences, limit=2)
+    result = strategy.pick([m1, m2, m3], preferences, limit=3)
 
     for movie in result:
         print(f"  {movie.title}")
