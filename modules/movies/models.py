@@ -8,8 +8,7 @@ from typing import List, Optional
 class MoviePreferences:
     preferred_genres: List[str] = field(default_factory=list)
 
-preferences=MoviePreferences(["фантастика", "драма"])
-print(preferences.preferred_genres)
+
 
 @dataclass
 class Movie:
@@ -50,3 +49,5 @@ if __name__ == "__main__":
     print(f"Все жанры: {movie.genres}")
     print(f"Для показа (2): {movie.display_genres()}")
     print(f"Текстом: {movie.genres_as_text()}")
+    preferences = MoviePreferences(["фантастика", "драма"])
+    print(preferences.preferred_genres)
